@@ -1,8 +1,6 @@
 import hashlib
 import random
 
-
-
 class Node:
 	"""A class that creates a Node"""
 	predecessor = 0
@@ -11,7 +9,6 @@ class Node:
 
 	def __init__(self,nodes):
 		self.ip = str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + ":" + str(random.randint(0, 65535))
-		# self.hashed_ip = hash(nodes)
 		hash_object = hashlib.sha1(self.ip)
 		self.hashed_ip = int(hash_object.hexdigest(), 16) % ((2 ** nodes) - 1)
 
@@ -25,8 +22,17 @@ class Node:
 				else:
 					self.successor = keylist[0]
 
-	def finger_table(self):
-		pass
+	def fill_finger_table(self, nodes, keylist):
+		next_node = 0
+		for i in range(nodes):
+			id = self.hashed_ip + 2 ** i
+			for j in keylist:
+				if j >= id:
+
+					next_node = j
+					break
+			record = (id, next_node)
+			self.finger_table.append(record)
 
 def main():
 	#ask user to give the number of nodes
@@ -34,19 +40,15 @@ def main():
 	requests = int(input("Enter the number requests \n"))
 
 	hashed_req = hashing(nodes, requests)
-	# print hashed_req
 
 
 	keylist, dict = create_nodes(nodes)
 	print keylist
+
 	for i in keylist:
 		dict[i].predecessor_successor(keylist)
-		print dict[i].successor
-		print dict[i].predecessor
-		print "\n"
-
-
-
+		dict[i].fill_finger_table(nodes,keylist)
+		print dict[i].finger_table
 
 
 
