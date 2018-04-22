@@ -5,12 +5,12 @@ class Node:
 	"""A class that creates a Node"""
 	predecessor = 0
 	successor = 0
-	finger_table =[]
 
 	def __init__(self,nodes):
 		self.ip = str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + ":" + str(random.randint(0, 65535))
-		hash_object = hashlib.sha1(self.ip)
+		hash_object = hashlib.sha1(self.ip)        
 		self.hashed_ip = int(hash_object.hexdigest(), 16) % ((2 ** nodes) - 1)
+		self.finger_table = []
 
 	def predecessor_successor(self,keylist):
 		for i in keylist:
@@ -26,9 +26,14 @@ class Node:
 		next_node = 0
 		for i in range(nodes):
 			id = self.hashed_ip + 2 ** i
+			if id >= (2 ** nodes):
+				id2 = id - (2 ** nodes)
+			else:
+				id2 = id
 			for j in keylist:
-				if j >= id:
-
+				if id > keylist[-1] and id < (2 ** nodes):
+					next_node = keylist[0]
+				elif j >= id2:
 					next_node = j
 					break
 			record = (id, next_node)
@@ -54,7 +59,7 @@ def main():
 
 def hashing(nodes, requests):
 	hash_list = []
-	with open('/Users/thanasiskaridis/Desktop/BigDataManagement/ChordImplementation/filenames.txt') as f:
+	with open('filenames.txt') as f:
 		lines = random.sample(f.readlines(), requests)
 		for line in lines:
 			hash_object = hashlib.sha1(line)
