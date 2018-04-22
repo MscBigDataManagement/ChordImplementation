@@ -49,17 +49,27 @@ def main():
 	nodes = int(input("Enter the number of nodes n\n"))
 	requests = int(input("Enter the number requests \n"))
 	keylist, dict = create_nodes(nodes)
+	print "########Keylist"
 	print keylist
+	print "\n"
 	# print dict
 	for i in keylist:
 		dict[i].predecessor_successor(keylist)
 		dict[i].responsibility()
-		print dict[i].responsible
+		# print "#######Responsible"
+		# print dict[i].responsible
+		# print "\n"
+		print "#######FingerTable"
 		dict[i].fill_finger_table(nodes,keylist)
+		print dict[i].finger_table
+		print "\n"
 	hashed_req = hashing(nodes, requests, keylist)
-	# print hashed_req
+	print "#######Request"
+	print hashed_req
+	print "\n"
 	for item in hashed_req:
-		end = lookup(item[0], item[2], dict)
+		end = lookup(item[0], item[2], dict, nodes)
+		print end
 
 
 def hashing(nodes, requests, keylist):
@@ -82,30 +92,33 @@ def create_nodes(nodes):
 	keylist.sort()
 	return keylist, dict
 
-def lookup(request, start,dict):
+def lookup(request, start,dict,nodes):
 	# print dict[start].finger_table
 	if request <= start:
-		if dict[start].responsible[0] <= request <= dict[start].responsible[1]:
-			return start
+		if dict[start].predecessor > dict[start].hashed_ip:
+			if dict[start].predecessor <= request <= (2 ** nodes)-1 or 0 <= request <= dict[start].hashed_ip:
+				return start
 		else:
 			for k in dict[start].finger_table:
 				if k[1] <= request:
 					new_start = k[1]
-					return lookup(request, new_start, dict)
+					return lookup(request, new_start, dict, nodes)
 			new_start = dict[start].finger_table[-1][1]
-			return lookup(request, new_start, dict)
+			return lookup(request, new_start, dict, nodes)
 	elif request > dict[start].finger_table[-1][0]:
 		new_start = dict[start].finger_table[-1][1]
-		return lookup(request, new_start, dict)
+		return lookup(request, new_start, dict, nodes)
 	else:
 		for i in dict[start].finger_table:
 			if request == i[0]:
-				if i[1].responsible[0] <= request <= i[1].responsible[1]:
-					return i[1]
-			elif request > i[0]:
+				return i[1]
+			elif request < i[0]:
 				ind = i.index(i[0])
 				new_start = dict[start].finger_table[ind - 1][1]
-				return lookup(request, new_start, dict)
+				if new_start > request:
+					return new_start
+				else:
+					return lookup(request, new_start, dict, nodes)
 
 if __name__ == "__main__":
 	main()
