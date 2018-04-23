@@ -2,7 +2,8 @@ import func
 
 
 def __main__():
-	"""This function will be called first. The implementation of Chord Algorithm"""
+	"""This function is the implementation of Chord Algorithm"""
+
 	responsible_nodes = []
 	messages_for_each = []
 

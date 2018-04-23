@@ -5,6 +5,7 @@ from Node import Node
 
 def inputNodes(message):
 	"""Check if the user's input is an integer"""
+
 	while True:
 		try:
 			Userinput = int(raw_input(message))
@@ -16,8 +17,8 @@ def inputNodes(message):
 
 def hashing(nodes, requests, keylist):
 	"""Function that read the given file line by line and hash each string using SHA-1.
+	The function returns a list of tuples. Each tuple has the requested item, the file's name and a random start"""
 
-		"""
 	hash_list = []
 	with open('/Users/thanasiskaridis/Desktop/BigDataManagement/ChordImplementation/filenames.txt') as f:
 		lines = random.sample(f.readlines(), requests)
@@ -30,6 +31,8 @@ def hashing(nodes, requests, keylist):
 
 
 def create_nodes(nodes):
+	""" This function gets the # of nodes as input. It creates a dictionary with node's hashed ip as key and as value the node object
+	From this dictionary we export a list which contains the keys of the dictionary sorted from min to max"""
 
 	diction = {}
 	for i in range(nodes):
@@ -41,6 +44,9 @@ def create_nodes(nodes):
 
 
 def lookup(start, diction, nodes, count_messages):
+	"""This function is the implementation of the lookup in the Chord. With this lookup the algorithm search for the Node that has the
+	requested item"""
+
 	request = diction[start].message[1]
 	next_message = (start, request)
 	if request <= start:

@@ -11,9 +11,14 @@ class Node:
 	##############################A method which"""
 
 	def __init__(self,nodes):
-		# creates an ip including port in order to have the form xxx.xxx.xxx.xxx:xxxx
+		"""the constructor creates the instant of a Node.
+		It also initialise its variables.
+		At the same time it give a value to the ip of the node.
+		More specifically, it creates an ip including port in order to have the form xxx.xxx.xxx.xxx:xxxx.
+		Then the ip is hashed by using SHA-1 """
+
 		self.ip = str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + ":" + str(random.randint(0, 65535))
-		hash_object = hashlib.sha1(self.ip)        #
+		hash_object = hashlib.sha1(self.ip)
 		self.hashed_ip = int(hash_object.hexdigest(), 16) % ((2 ** nodes) - 1)
 		self.finger_table = []
 		self.predecessor = 0
@@ -26,12 +31,13 @@ class Node:
 
 		for i in keylist:
 			if i == self.hashed_ip:
-				ind = keylist.index(i)
-				self.predecessor = keylist[ind - 1]
-				if ind != (len(keylist) - 1):
+				ind = keylist.index(i)                  # finds the index of the node's ip into the list
+				self.predecessor = keylist[ind - 1]     # gives the value of the previous indexed item to predecessor (in case of first item
+														# the predecessor is the last item of the list)
+				if ind != (len(keylist) - 1):           # the value of the next item in the list is the successor
 					self.successor = keylist[ind+1]
 				else:
-					self.successor = keylist[0]
+					self.successor = keylist[0]         # case of last item. The successor is the first element of the list
 
 	def fill_finger_table(self, nodes, keylist):
 		"""Method that get the sorted list of all alive nodes,
