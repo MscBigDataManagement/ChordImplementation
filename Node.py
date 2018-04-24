@@ -4,17 +4,16 @@ import random
 
 class Node:
 	"""This class creates a Node obstacle. It includes the above methods:
-	A constructor which creates the object of Node, when the class is called.
-	A method which can find the predecessor and the successor of the node
-	A method which fill the Finger Table which is used in order to perform the
-	Chord algorithm
-	##############################A method which"""
+	- A constructor which creates the object of Node, when the class is called.
+	- A method which finds the predecessor and the successor of the node.
+	- A method which fills the Finger Table used to perform the Chord algorithm.
+	- A method which gets a message and stores it in each node."""
 
 	def __init__(self,nodes):
-		"""the constructor creates the instant of a Node.
-		It also initialise its variables.
-		At the same time it give a value to the ip of the node.
-		More specifically, it creates an ip including port in order to have the form xxx.xxx.xxx.xxx:xxxx.
+		"""The constructor creates the instant of a Node.
+		It also initialises its variables.
+		At the same time it gives a value to the ip of the node.
+		More specifically, it creates an ip including a port in order to have the form xxx.xxx.xxx.xxx:xxxx.
 		Then the ip is hashed by using SHA-1 """
 
 		self.ip = str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + ":" + str(random.randint(0, 65535))
@@ -26,7 +25,7 @@ class Node:
 		self.message = ()
 
 	def predecessor_successor(self, keylist):
-		"""Method that get the sorted list of all alive nodes and gives as a result the predecessor
+		"""Method that gets the sorted list of all alive nodes and gives as a result the predecessor
 		and the successor of the node"""
 
 		for i in keylist:
@@ -40,8 +39,8 @@ class Node:
 					self.successor = keylist[0]         # case of last item. The successor is the first element of the list
 
 	def fill_finger_table(self, nodes, keylist):
-		"""Method that get the sorted list of all alive nodes,
-		the number of nodes and fill the Finger Table of the node"""
+		"""Method that gets the sorted list of all alive nodes,
+		the number of nodes and fills the Finger Table of the node"""
 
 		next_node = 0
 		for i in range(0, nodes):
@@ -60,5 +59,5 @@ class Node:
 			self.finger_table.append(record)
 
 	def messages_list(self, message):
-		"""???????????????????????????????????????"""
+		"""Method that gets a message for a node and writes it in its message space"""
 		self.message = message
