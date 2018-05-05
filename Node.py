@@ -1,5 +1,6 @@
 import hashlib
 import random
+import math
 
 
 class Node:
@@ -15,10 +16,10 @@ class Node:
 		At the same time it gives a value to the ip of the node.
 		More specifically, it creates an ip including a port in order to have the form xxx.xxx.xxx.xxx:xxxx.
 		Then the ip is hashed by using SHA-1 """
-
+		ring = int(math.log(nodes,2)) + 1
 		self.ip = str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + ":" + str(random.randint(0, 65535))
 		hash_object = hashlib.sha1(self.ip)
-		self.hashed_ip = int(hash_object.hexdigest(), 16) % ((2 ** nodes) - 1)
+		self.hashed_ip = int(hash_object.hexdigest(), 16) % (2 ** ring)
 		self.finger_table = []
 		self.predecessor = 0
 		self.successor = 0
@@ -43,14 +44,15 @@ class Node:
 		the number of nodes and fills the Finger Table of the node"""
 
 		next_node = 0
+		ring = int(math.log(nodes,2)) + 1
 		for i in range(0, nodes):
 			id = self.hashed_ip + 2 ** i
-			if id >= (2 ** nodes):
-				id2 = id - (2 ** nodes)
+			if id >= (2 ** ring):
+				id2 = id - (2 ** ring)
 			else:
 				id2 = id
 			for j in keylist:
-				if id > keylist[-1] and id < (2 ** nodes):
+				if id > keylist[-1] and id < (2 ** ring):
 					next_node = keylist[0]
 				elif j >= id2:
 					next_node = j

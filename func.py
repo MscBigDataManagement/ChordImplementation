@@ -1,6 +1,7 @@
 import random
 import hashlib
 from Node import Node
+import math
 
 
 def inputNodes(message):
@@ -20,11 +21,13 @@ def hashing(nodes, requests, keylist):
 	The function returns a list of tuples. Each tuple has the requested item, the file's name and a random start"""
 
 	hash_list = []
+	ring = int(math.log(nodes,2)) + 1
+
 	with open('filenames.txt') as f:
 		lines = random.sample(f.readlines(), requests)
 		for line in lines:
 			hash_object = hashlib.sha1(line)
-			hash_key = int(hash_object.hexdigest(), 16) % ((2 ** nodes) - 1)
+			hash_key = int(hash_object.hexdigest(), 16) % (2 ** ring)
 			hash_tuple = (hash_key, line.rstrip('\n'), random.choice(keylist))
 			hash_list.append(hash_tuple)
 	return hash_list
@@ -50,9 +53,11 @@ def lookup(start, diction, nodes, count_messages, list_nodes):
 	request = diction[start].message[1]
 	next_message = (start, request)
 
+	ring = int(math.log(nodes,2)) + 1
+
 	if request <= start:
 		if diction[start].predecessor > diction[start].hashed_ip:
-			if diction[start].predecessor <= request <= (2 ** nodes)-1 or 0 <= request <= diction[start].hashed_ip:
+			if diction[start].predecessor <= request <= (2 ** ring)-1 or 0 <= request <= diction[start].hashed_ip:
 				count_messages = count_messages - 1
 				return (start, count_messages, list_nodes)
 			else:
@@ -69,7 +74,7 @@ def lookup(start, diction, nodes, count_messages, list_nodes):
 				new_start = diction[start].finger_table[-1][1]
 				for k in diction[start].finger_table:
 					if k[0] > k[1]:
-						if k[0] <= request <= (2 ** nodes)-1 or 0 <= request <= k[1]:
+						if k[0] <= request <= (2 ** ring)-1 or 0 <= request <= k[1]:
 							return (k[1], count_messages, list_nodes)
 					else:
 						if k[1] < request:
@@ -90,7 +95,7 @@ def lookup(start, diction, nodes, count_messages, list_nodes):
 				list_nodes.append(new_tuple[1])
 				return lookup(new_tuple[1], diction, nodes, count_messages, list_nodes)
 		else:
-			if new_tuple[0] <= request <= (2 ** nodes) - 1 or 0 <= request <= new_tuple[1]:
+			if new_tuple[0] <= request <= (2 ** ring) - 1 or 0 <= request <= new_tuple[1]:
 				return (new_tuple[1], count_messages, list_nodes)
 			else:
 				diction[new_tuple[1]].messages_list(next_message)

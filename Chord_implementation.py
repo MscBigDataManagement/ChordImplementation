@@ -9,7 +9,8 @@ def __main__():
 	responsible_nodes = []
 	messages_for_each = []
 	list_nodes = []
-	flat_list = []
+	#flat_list = []
+
 
 	# ask user to give the number of alive Nodes and the number of requests
 	nodes = func.inputNodes("Enter the number of nodes \n ")
@@ -18,9 +19,9 @@ def __main__():
 	# fill the ordered list of alive Nodes and a dictionary which has as key node and as value the movie
 	keylist, diction = func.create_nodes(nodes)
 
-	#print "########Keylist"
-	#print keylist
-	#print "\n"
+	print "########Keylist"
+	print keylist
+	print "\n"
 	
 	# for each one of the nodes call the method predecessor_successor and the one that fills the finger_table
 	for i in keylist:
@@ -30,8 +31,9 @@ def __main__():
 	# fill a list of tuples
 	hashed_req = func.hashing(nodes, requests, keylist)
 
-	#print "#######Request"
-	#print hashed_req
+	print "#######Request"
+	print hashed_req
+
 	#print "\n"
 
 	for item in hashed_req:
@@ -44,11 +46,13 @@ def __main__():
 		messages_for_each.append(end[1])
 
 	print responsible_nodes
-	#print "\n"
-	#print messages_for_each
-	#print "\n"
-	#print list_nodes
-	#print "\n"
+
+	print "\n"
+	print messages_for_each
+	print "\n"
+	print list_nodes
+	print "\n"
+
 
 	occurencies_router = Counter(list_nodes)
 	print "Routing requests:", occurencies_router
