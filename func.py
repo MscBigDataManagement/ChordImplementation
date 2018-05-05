@@ -128,4 +128,3 @@ def lookup(start, diction, nodes, count_messages, list_nodes):
 				count_messages = count_messages + 1
 				list_nodes.append(new_tuple[1])
 				return lookup(new_tuple[1], diction, nodes, count_messages, list_nodes)
-
