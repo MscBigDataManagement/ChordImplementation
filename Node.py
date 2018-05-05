@@ -16,14 +16,15 @@ class Node:
 		At the same time it gives a value to the ip of the node.
 		More specifically, it creates an ip including a port in order to have the form xxx.xxx.xxx.xxx:xxxx.
 		Then the ip is hashed by using SHA-1 """
-		ring = int(math.log(nodes,2)) + 1
+		# ring = int(math.log(nodes,2)) + 1
 		self.ip = str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + ":" + str(random.randint(0, 65535))
 		hash_object = hashlib.sha1(self.ip)
-		self.hashed_ip = int(hash_object.hexdigest(), 16) % (2 ** ring)
+		self.hashed_ip = int(hash_object.hexdigest(), 16) % (2 ** nodes)
 		self.finger_table = []
 		self.predecessor = 0
 		self.successor = 0
 		self.message = []
+		self.msg = ()
 
 	def predecessor_successor(self, keylist):
 		"""Method that gets the sorted list of all alive nodes and gives as a result the predecessor
@@ -47,12 +48,12 @@ class Node:
 		ring = int(math.log(nodes,2)) + 1
 		for i in range(0, nodes):
 			id = self.hashed_ip + 2 ** i
-			if id >= (2 ** ring):
-				id2 = id - (2 ** ring)
+			if id >= (2 ** nodes):
+				id2 = id - (2 ** nodes)
 			else:
 				id2 = id
 			for j in keylist:
-				if id > keylist[-1] and id < (2 ** ring):
+				if id > keylist[-1] and id < (2 ** nodes):
 					next_node = keylist[0]
 				elif j >= id2:
 					next_node = j
@@ -65,3 +66,6 @@ class Node:
 	def messages_list(self, message):
 		"""Method that gets a message for a node and writes it in its message space"""
 		self.message.append(message)
+
+	def msg_to_next(self, msg):
+		self.msg = msg
