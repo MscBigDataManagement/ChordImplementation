@@ -1,12 +1,11 @@
 import random
 import hashlib
 from Node import Node
-import math
 from scipy.stats import powerlaw
 
 
 
-def inputNodes(message):
+def checkInputs(message):
 	"""Check if the user's input is an integer"""
 
 	while True:
@@ -17,8 +16,7 @@ def inputNodes(message):
 		else:
 			return Userinput
 
-
-def hashing(nodes):
+def hashing(requests, nodes):
 	"""Function that read the given file line by line and hash each string using SHA-1.
 	The function returns a list of tuples. Each tuple has the requested item, the file's name and a random start"""
 
@@ -26,13 +24,13 @@ def hashing(nodes):
 	# ring = int(math.log(nodes,2)) + 1
 	with open('test.txt') as f:
 		count = 0
-		lines = f.readlines()
+		lines = random.sample(f.readlines(), requests)
 		print len(lines)
-		popularity = powerlaw.rvs(1.65, size=len(lines), discrete=True, scale=10)
+		popularity = powerlaw.rvs(1.65, size=len(lines), discrete=True, scale=500)
 		print popularity
 		for line in lines:
 			hash_object = hashlib.sha1(line)
-			hash_key = int(hash_object.hexdigest(), 16) % (2 ** nodes)
+			hash_key = int(hash_object.hexdigest(), 16) % (2 ** 160)
 			hash_tuple = (hash_key, line.rstrip('\n'), popularity[count])
 			hash_list.append(hash_tuple)
 			count += 1
@@ -83,7 +81,7 @@ def lookup(start, diction, nodes, count_messages, list_nodes):
 
 	if request <= start:
 		if diction[start].predecessor > diction[start].hashed_ip:
-			if diction[start].predecessor < request <= (2 ** nodes)-1 or 0 <= request <= diction[start].hashed_ip:
+			if diction[start].predecessor < request <= (2 ** 160)-1 or 0 <= request <= diction[start].hashed_ip:
 				# count_messages = count_messages - 1
 				return (start, count_messages, list_nodes)
 			else:
@@ -100,7 +98,7 @@ def lookup(start, diction, nodes, count_messages, list_nodes):
 				new_start = diction[start].finger_table[-1][1]
 				for k in diction[start].finger_table:
 					if k[0] > k[1]:
-						if k[0] <= request <= (2 ** nodes)-1 or 0 <= request <= k[1]:
+						if k[0] <= request <= (2 ** 160)-1 or 0 <= request <= k[1]:
 							return (k[1], count_messages, list_nodes)
 					else:
 						if k[1] < request:
@@ -122,7 +120,7 @@ def lookup(start, diction, nodes, count_messages, list_nodes):
 				list_nodes.append(new_tuple[1])
 				return lookup(new_tuple[1], diction, nodes, count_messages, list_nodes)
 		else:
-			if new_tuple[0] <= request <= (2 ** nodes) - 1 or 0 <= request <= new_tuple[1]:
+			if new_tuple[0] <= request <= (2 ** 160) - 1 or 0 <= request <= new_tuple[1]:
 				# count_messages = count_messages - 1
 				return (new_tuple[1], count_messages, list_nodes)
 			else:

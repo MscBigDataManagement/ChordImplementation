@@ -1,13 +1,14 @@
 import func
 from collections import Counter
-from collections import defaultdict
 
 def __main__():
 	"""This function is the function main which calls all the other functions and runs the Chord Algorithm
 	It also performs some measurements regarding the number of messages needed to locate a single file and the load of each node"""
 
-	# ask user to give the number of alive Nodes and the number of requests
-	nodes = func.inputNodes("Enter the number of nodes \n ")
+	# ask user to give the number of requests
+	requests = func.checkInputs("Enter the number of Requests \n ")
+	# ask user to give the number of alive Nodes
+	nodes = func.checkInputs("Enter the number of nodes \n ")
 
 	# fill the ordered list of alive Nodes and a dictionary which has as key node and as value the movie
 	keylist, diction = func.create_nodes(nodes)
@@ -22,7 +23,7 @@ def __main__():
 		diction[i].fill_finger_table(nodes,keylist)
 
 	# fill a list of tuples
-	hashed_req = func.hashing(nodes)
+	hashed_req = func.hashing(requests, nodes)
 
 	for j in hashed_req:
 		func.fill_requests(keylist, diction, j[0], j[2])
