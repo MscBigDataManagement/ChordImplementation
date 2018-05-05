@@ -23,7 +23,7 @@ class Node:
 		self.finger_table = []
 		self.predecessor = 0
 		self.successor = 0
-		self.message = ()
+		self.message = []
 
 	def predecessor_successor(self, keylist):
 		"""Method that gets the sorted list of all alive nodes and gives as a result the predecessor
@@ -59,7 +59,9 @@ class Node:
 					break
 			record = (id, next_node)
 			self.finger_table.append(record)
+		print self.finger_table
+		print "\n"
 
 	def messages_list(self, message):
 		"""Method that gets a message for a node and writes it in its message space"""
-		self.message = message
+		self.message.append(message)
