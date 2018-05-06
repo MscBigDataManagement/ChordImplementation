@@ -18,7 +18,7 @@ class Node:
 		# ring = int(math.log(nodes,2)) + 1
 		self.ip = str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + ":" + str(random.randint(0, 65535))
 		hash_object = hashlib.sha1(self.ip)
-		self.hashed_ip = int(hash_object.hexdigest(), 16) % (2 ** 160)
+		self.hashed_ip = int(hash_object.hexdigest(), 16) % (2 ** 15)
 		self.finger_table = []
 		self.predecessor = 0
 		self.successor = 0
@@ -46,12 +46,12 @@ class Node:
 		next_node = 0
 		for i in range(0, nodes):
 			id = self.hashed_ip + 2 ** i
-			if id >= (2 ** 160):
-				id2 = id - (2 ** 160)
+			if id >= (2 ** 15):
+				id2 = id - (2 ** 15)
 			else:
 				id2 = id
 			for j in keylist:
-				if id > keylist[-1] and id < (2 ** 160):
+				if id > keylist[-1] and id < (2 ** 15):
 					next_node = keylist[0]
 				elif j >= id2:
 					next_node = j

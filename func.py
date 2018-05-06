@@ -25,11 +25,13 @@ def hashing(requests, nodes):
 	with open('filenames.txt') as f:
 		count = 0
 		lines = random.sample(f.readlines(), requests)
-		popularity = powerlaw.rvs(1.65, size=len(lines), discrete=True, scale=100)
+		popularity = powerlaw.rvs(1.65, size=len(lines), discrete=True, scale=10)
+		# popularity = 1
 		for line in lines:
 			hash_object = hashlib.sha1(line)
-			hash_key = int(hash_object.hexdigest(), 16) % (2 ** 160)
+			hash_key = int(hash_object.hexdigest(), 16) % (2 ** 15)
 			hash_tuple = (hash_key, line.rstrip('\n'), popularity[count])
+			# hash_tuple = (hash_key, line.rstrip('\n'), popularity)
 			hash_list.append(hash_tuple)
 			count += 1
 	return hash_list
@@ -77,14 +79,14 @@ def lookup(start, diction, nodes, count_messages, list_nodes):
 	next_message = (start, request)
 	
 	if diction[start].predecessor > diction[start].hashed_ip:
-		if diction[start].predecessor < request <= (2 ** 160)-1 or 0 <= request <= diction[start].hashed_ip:
+		if diction[start].predecessor < request <= (2 ** 15)-1 or 0 <= request <= diction[start].hashed_ip:
 			return (start, count_messages, list_nodes)
 	else:
 		if diction[start].predecessor < request <= diction[start].hashed_ip:
 			return (start, count_messages, list_nodes)
 
 	if diction[start].successor < diction[start].hashed_ip:
-		if diction[start].hashed_ip < request <= (2 ** 160)-1 or 0 <= request <= diction[start].successor:
+		if diction[start].hashed_ip < request <= (2 ** 15)-1 or 0 <= request <= diction[start].successor:
 			return (diction[start].successor, count_messages, list_nodes)
 	else:
 		if diction[start].hashed_ip < request <= diction[start].successor:
@@ -92,7 +94,7 @@ def lookup(start, diction, nodes, count_messages, list_nodes):
 
 	for item in reversed(diction[start].finger_table):
 		if request < start:
-			if diction[start].hashed_ip < item[1] <= (2 ** 160)-1 or 0 <= item[1] < request:
+			if diction[start].hashed_ip < item[1] <= (2 ** 15)-1 or 0 <= item[1] < request:
 				diction[item[1]].msg_to_next(next_message)
 				count_messages = count_messages + 1
 				list_nodes.append(item[1])
