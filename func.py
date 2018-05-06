@@ -2,6 +2,9 @@ import random
 import hashlib
 from Node import Node
 from scipy.stats import powerlaw
+from collections import Counter
+import csv
+import re
 
 def checkInputs(message):
 	"""Check if the user's input is an integer"""
@@ -101,3 +104,37 @@ def lookup(start, diction, nodes, count_messages, list_nodes):
 				list_nodes.append(item[1])
 				return lookup(item[1], diction, nodes, count_messages, list_nodes)
 
+def statistical_analysis(diction, messages_for_each, list_nodes, responsible_nodes):
+	tot_messages = {}
+	all_requests = []
+
+	for k in diction.keys():
+		print diction[k].message
+		all_requests.append(diction[k].message)
+	all_requests = [item for sublist in all_requests for item in sublist]
+	my_tuples = zip(all_requests, messages_for_each)
+	for x, y in my_tuples:
+		tot_messages.setdefault(x, []).append(y)
+	for item in tot_messages.keys():
+		tot_messages[item] = sum(tot_messages[item])/float(len(tot_messages[item]))
+
+	occurencies_router = Counter(list_nodes)
+	print "Routing requests:", occurencies_router
+
+	occurencies_requests = Counter(responsible_nodes)
+	print "File requests:", occurencies_requests
+
+	write_files('Load of node by requests.csv', occurencies_requests)
+	write_files('Load of node by routed.csv', occurencies_router)
+	write_files('Average messages.csv', tot_messages)
+
+	with open('Sum of messages.csv', 'a') as f:
+		f.write(str(sum(messages_for_each)))
+		writer = csv.writer(f, delimiter=';', lineterminator='\n', dialect='excel')
+
+def write_files(file, type_of_data):
+	writefile = open(file, 'a')
+	writer = csv.writer(writefile)
+	for key, count in type_of_data.iteritems():
+		writer.writerow([key, float(count)])
+	writefile.close()
