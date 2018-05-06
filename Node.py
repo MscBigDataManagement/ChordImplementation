@@ -18,7 +18,7 @@ class Node:
 		# ring = int(math.log(nodes,2)) + 1
 		self.ip = str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + ":" + str(random.randint(0, 65535))
 		hash_object = hashlib.sha1(self.ip)
-		self.hashed_ip = int(hash_object.hexdigest(), 16) % (2 ** nodes)
+		self.hashed_ip = int(hash_object.hexdigest(), 16) % (2 ** 160)
 		self.finger_table = []
 		self.predecessor = 0
 		self.successor = 0
@@ -46,20 +46,20 @@ class Node:
 		next_node = 0
 		for i in range(0, nodes):
 			id = self.hashed_ip + 2 ** i
-			if id >= (2 ** nodes):
-				id2 = id - (2 ** nodes)
+			if id >= (2 ** 160):
+				id2 = id - (2 ** 160)
 			else:
 				id2 = id
 			for j in keylist:
-				if id > keylist[-1] and id < (2 ** nodes):
+				if id > keylist[-1] and id < (2 ** 160):
 					next_node = keylist[0]
 				elif j >= id2:
 					next_node = j
 					break
 			record = (id, next_node)
 			self.finger_table.append(record)
-		print self.finger_table
-		print "\n"
+		# print self.finger_table
+		# print "\n"
 
 	def messages_list(self, message):
 		"""Method that gets a message for a node and writes it in its message space"""
@@ -67,3 +67,4 @@ class Node:
 
 	def msg_to_next(self, msg):
 		self.msg = msg
+

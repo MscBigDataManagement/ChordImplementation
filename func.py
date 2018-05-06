@@ -25,10 +25,10 @@ def hashing(requests, nodes):
 	with open('filenames.txt') as f:
 		count = 0
 		lines = random.sample(f.readlines(), requests)
-		popularity = powerlaw.rvs(1.65, size=len(lines), discrete=True, scale=10)
+		popularity = powerlaw.rvs(1.65, size=len(lines), discrete=True, scale=100)
 		for line in lines:
 			hash_object = hashlib.sha1(line)
-			hash_key = int(hash_object.hexdigest(), 16) % (2 ** nodes)
+			hash_key = int(hash_object.hexdigest(), 16) % (2 ** 160)
 			hash_tuple = (hash_key, line.rstrip('\n'), popularity[count])
 			hash_list.append(hash_tuple)
 			count += 1
@@ -77,14 +77,14 @@ def lookup(start, diction, nodes, count_messages, list_nodes):
 	next_message = (start, request)
 	
 	if diction[start].predecessor > diction[start].hashed_ip:
-		if diction[start].predecessor < request <= (2 ** nodes)-1 or 0 <= request <= diction[start].hashed_ip:
+		if diction[start].predecessor < request <= (2 ** 160)-1 or 0 <= request <= diction[start].hashed_ip:
 			return (start, count_messages, list_nodes)
 	else:
 		if diction[start].predecessor < request <= diction[start].hashed_ip:
 			return (start, count_messages, list_nodes)
 
 	if diction[start].successor < diction[start].hashed_ip:
-		if diction[start].hashed_ip < request <= (2 ** nodes)-1 or 0 <= request <= diction[start].successor:
+		if diction[start].hashed_ip < request <= (2 ** 160)-1 or 0 <= request <= diction[start].successor:
 			return (diction[start].successor, count_messages, list_nodes)
 	else:
 		if diction[start].hashed_ip < request <= diction[start].successor:
@@ -92,7 +92,7 @@ def lookup(start, diction, nodes, count_messages, list_nodes):
 
 	for item in reversed(diction[start].finger_table):
 		if request < start:
-			if diction[start].hashed_ip < item[1] <= (2 ** nodes)-1 or 0 <= item[1] < request:
+			if diction[start].hashed_ip < item[1] <= (2 ** 160)-1 or 0 <= item[1] < request:
 				diction[item[1]].msg_to_next(next_message)
 				count_messages = count_messages + 1
 				list_nodes.append(item[1])
@@ -109,32 +109,37 @@ def statistical_analysis(diction, messages_for_each, list_nodes, responsible_nod
 	all_requests = []
 
 	for k in diction.keys():
-		print diction[k].message
+		# print diction[k].message
 		all_requests.append(diction[k].message)
 	all_requests = [item for sublist in all_requests for item in sublist]
 	my_tuples = zip(all_requests, messages_for_each)
 	for x, y in my_tuples:
 		tot_messages.setdefault(x, []).append(y)
 	for item in tot_messages.keys():
-		tot_messages[item] = sum(tot_messages[item])/float(len(tot_messages[item]))
+		tot_messages[item] = round(sum(tot_messages[item])/float(len(tot_messages[item])), 2)
 
 	occurencies_router = Counter(list_nodes)
-	print "Routing requests:", occurencies_router
+	# print "Routing requests:", occurencies_router
 
 	occurencies_requests = Counter(responsible_nodes)
-	print "File requests:", occurencies_requests
+	# print "File requests:", occurencies_requests
 
 	write_files('Load of node by requests.csv', occurencies_requests)
 	write_files('Load of node by routed.csv', occurencies_router)
 	write_files('Average messages.csv', tot_messages)
 
-	with open('Sum of messages.csv', 'a') as f:
-		f.write(str(sum(messages_for_each)))
-		writer = csv.writer(f, delimiter=';', lineterminator='\n', dialect='excel')
+	test = sum(messages_for_each)
+	test2 = []
+	test2.append(test)
+	writefile = open('Sum of messages.csv', 'a')
+	writer = csv.writer(writefile)
+	writer.writerow(test2)
+	writefile.close()
+
 
 def write_files(file, type_of_data):
 	writefile = open(file, 'a')
 	writer = csv.writer(writefile)
 	for key, count in type_of_data.iteritems():
-		writer.writerow([key, float(count)])
+		writer.writerow([key, str(count)])
 	writefile.close()
