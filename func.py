@@ -3,8 +3,6 @@ import hashlib
 from Node import Node
 from scipy.stats import powerlaw
 
-
-
 def checkInputs(message):
 	"""Check if the user's input is an integer"""
 
@@ -21,13 +19,10 @@ def hashing(requests, nodes):
 	The function returns a list of tuples. Each tuple has the requested item, the file's name and a random start"""
 
 	hash_list = []
-	# ring = int(math.log(nodes,2)) + 1
 	with open('filenames.txt') as f:
 		count = 0
 		lines = random.sample(f.readlines(), requests)
-		#print len(lines)
 		popularity = powerlaw.rvs(1.65, size=len(lines), discrete=True, scale=10)
-		#print popularity
 		for line in lines:
 			hash_object = hashlib.sha1(line)
 			hash_key = int(hash_object.hexdigest(), 16) % (2 ** nodes)
@@ -93,10 +88,6 @@ def lookup(start, diction, nodes, count_messages, list_nodes):
 			return (diction[start].successor, count_messages, list_nodes)
 
 	for item in reversed(diction[start].finger_table):
-#		if request == item[0]:
-#			count_messages = count_messages + 1
-#			list_nodes.append(item[1])
-#			return (item[1], count_messages, list_nodes)
 		if request < start:
 			if diction[start].hashed_ip < item[1] <= (2 ** nodes)-1 or 0 <= item[1] < request:
 				diction[item[1]].msg_to_next(next_message)

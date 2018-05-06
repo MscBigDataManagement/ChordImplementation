@@ -2,7 +2,6 @@ import hashlib
 import random
 import math
 
-
 class Node:
 	"""This class creates a Node obstacle. It includes the above methods:
 	- A constructor which creates the object of Node, when the class is called.

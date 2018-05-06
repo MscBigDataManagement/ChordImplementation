@@ -28,9 +28,26 @@ def __main__():
 	for j in hashed_req:
 		func.fill_requests(keylist, diction, j[0], j[2])
 
+	all_requests = []
 	for k in diction.keys():
 		print diction[k].message
+		all_requests.append(diction[k].message)
+	print "all-requests"
+	all_requests = [item for sublist in all_requests for item in sublist]
+
+	print all_requests
 	responsible_nodes, messages_for_each, list_nodes = func.read_requests(diction, nodes)
+
+
+	tot_messages = {}
+	my_tuples = zip(all_requests, messages_for_each)
+	for x, y in my_tuples:
+		tot_messages.setdefault(x, []).append(y)
+	print tot_messages
+
+	for item in tot_messages.keys():
+		tot_messages[item] = sum(tot_messages[item])/float(len(tot_messages[item]))
+	print tot_messages
 
 	print "#######Request"
 	for i in hashed_req:
@@ -56,6 +73,5 @@ def __main__():
 
 	occurencies_requests = Counter(responsible_nodes)
 	print "File requests:", occurencies_requests
-	#
-	# """   EDW PREPEI NA KANOYME TIPOTA AVG H MEAN H KATI GIA NA VGALOUME SYMPERASMATA"""
-	#
+
+
