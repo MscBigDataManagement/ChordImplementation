@@ -22,15 +22,15 @@ def hashing(requests, nodes):
 
 	hash_list = []
 	# ring = int(math.log(nodes,2)) + 1
-	with open('test.txt') as f:
+	with open('filenames.txt') as f:
 		count = 0
 		lines = random.sample(f.readlines(), requests)
-		print len(lines)
-		popularity = powerlaw.rvs(1.65, size=len(lines), discrete=True, scale=500)
-		print popularity
+		#print len(lines)
+		popularity = powerlaw.rvs(1.65, size=len(lines), discrete=True, scale=10)
+		#print popularity
 		for line in lines:
 			hash_object = hashlib.sha1(line)
-			hash_key = int(hash_object.hexdigest(), 16) % (2 ** 160)
+			hash_key = int(hash_object.hexdigest(), 16) % (2 ** nodes)
 			hash_tuple = (hash_key, line.rstrip('\n'), popularity[count])
 			hash_list.append(hash_tuple)
 			count += 1
@@ -65,9 +65,9 @@ def read_requests(diction, nodes):
 			diction[start].msg_to_next(first_message)
 			counter_message = 0
 			list_nodes.append(start)
-			end = lookup(start, diction, nodes, counter_message, list_nodes)
-			responsible_nodes.append(end[0])
-			messages_for_each.append(end[1])
+			resp_node, count_msg, list_nodes = lookup(start, diction, nodes, counter_message, list_nodes)
+			responsible_nodes.append(resp_node)
+			messages_for_each.append(count_msg)
 	return responsible_nodes, messages_for_each, list_nodes
 
 
@@ -77,54 +77,36 @@ def lookup(start, diction, nodes, count_messages, list_nodes):
 
 	request = diction[start].msg[1]
 	next_message = (start, request)
-	#ring = int(math.log(nodes,2)) + 1
-
-	if request <= start:
-		if diction[start].predecessor > diction[start].hashed_ip:
-			if diction[start].predecessor < request <= (2 ** 160)-1 or 0 <= request <= diction[start].hashed_ip:
-				# count_messages = count_messages - 1
-				return (start, count_messages, list_nodes)
-			else:
-				new_start = diction[start].finger_table[-1][1]
-				diction[new_start].msg_to_next(next_message)
-				count_messages = count_messages + 1
-				list_nodes.append(new_start)
-				return lookup(new_start, diction, nodes, count_messages, list_nodes)
-		else:
-			if diction[start].predecessor < request <= diction[start].hashed_ip:
-				# count_messages = count_messages - 1
-				return (start, count_messages, list_nodes)
-			else:
-				new_start = diction[start].finger_table[-1][1]
-				for k in diction[start].finger_table:
-					if k[0] > k[1]:
-						if k[0] <= request <= (2 ** 160)-1 or 0 <= request <= k[1]:
-							return (k[1], count_messages, list_nodes)
-					else:
-						if k[1] < request:
-							new_start = k[1]
-				diction[new_start].msg_to_next(next_message)
-				count_messages = count_messages + 1
-				list_nodes.append(new_start)
-				return lookup(new_start, diction, nodes, count_messages, list_nodes)
+	
+	if diction[start].predecessor > diction[start].hashed_ip:
+		if diction[start].predecessor < request <= (2 ** nodes)-1 or 0 <= request <= diction[start].hashed_ip:
+			return (start, count_messages, list_nodes)
 	else:
-		max_num = [i for i in diction[start].finger_table if i[0] <= request]
-		new_tuple = max(max_num, key = lambda item:item[0])
-		if new_tuple[0] <= new_tuple[1]:
-			if new_tuple[0] <= request <= new_tuple[1]:
-				# count_messages = count_messages - 1
-				return (new_tuple[1], count_messages, list_nodes)
-			else:
-				diction[new_tuple[1]].msg_to_next(next_message)
+		if diction[start].predecessor < request <= diction[start].hashed_ip:
+			return (start, count_messages, list_nodes)
+
+	if diction[start].successor < diction[start].hashed_ip:
+		if diction[start].hashed_ip < request <= (2 ** nodes)-1 or 0 <= request <= diction[start].successor:
+			return (diction[start].successor, count_messages, list_nodes)
+	else:
+		if diction[start].hashed_ip < request <= diction[start].successor:
+			return (diction[start].successor, count_messages, list_nodes)
+
+	for item in reversed(diction[start].finger_table):
+#		if request == item[0]:
+#			count_messages = count_messages + 1
+#			list_nodes.append(item[1])
+#			return (item[1], count_messages, list_nodes)
+		if request < start:
+			if diction[start].hashed_ip < item[1] <= (2 ** nodes)-1 or 0 <= item[1] < request:
+				diction[item[1]].msg_to_next(next_message)
 				count_messages = count_messages + 1
-				list_nodes.append(new_tuple[1])
-				return lookup(new_tuple[1], diction, nodes, count_messages, list_nodes)
+				list_nodes.append(item[1])
+				return lookup(item[1], diction, nodes, count_messages, list_nodes)
 		else:
-			if new_tuple[0] <= request <= (2 ** 160) - 1 or 0 <= request <= new_tuple[1]:
-				# count_messages = count_messages - 1
-				return (new_tuple[1], count_messages, list_nodes)
-			else:
-				diction[new_tuple[1]].msg_to_next(next_message)
+			if diction[start].hashed_ip < item[1] < request:
+				diction[item[1]].msg_to_next(next_message)
 				count_messages = count_messages + 1
-				list_nodes.append(new_tuple[1])
-				return lookup(new_tuple[1], diction, nodes, count_messages, list_nodes)
+				list_nodes.append(item[1])
+				return lookup(item[1], diction, nodes, count_messages, list_nodes)
+
