@@ -1,6 +1,12 @@
 import hashlib
 import random
-import math
+
+"""Big Data Management - Msc Data Science -1st Programming Assignment
+    Team Members:
+    - Voulgari Eleni - A.M. 17005 - email: dsc17005@uop.gr
+    - Karydis Athanasios - A.M. 17008 - email: dsc17008@uop.gr
+    Chord - based simulation of a distributed file system"""
+
 
 class Node:
 	"""This class creates a Node obstacle. It includes the above methods:
@@ -15,7 +21,7 @@ class Node:
 		At the same time it gives a value to the ip of the node.
 		More specifically, it creates an ip including a port in order to have the form xxx.xxx.xxx.xxx:xxxx.
 		Then the ip is hashed by using SHA-1 """
-		# ring = int(math.log(nodes,2)) + 1
+
 		self.ip = str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + '.' + str(random.randint(0, 255)) + ":" + str(random.randint(0, 65535))
 		hash_object = hashlib.sha1(self.ip)
 		self.hashed_ip = int(hash_object.hexdigest(), 16) % (2 ** 15)
@@ -31,13 +37,12 @@ class Node:
 
 		for i in keylist:
 			if i == self.hashed_ip:
-				ind = keylist.index(i)                  # finds the index of the node's ip into the list
-				self.predecessor = keylist[ind - 1]     # gives the value of the previous indexed item to predecessor (in case of first item
-														# the predecessor is the last item of the list)
-				if ind != (len(keylist) - 1):           # the value of the next item in the list is the successor
+				ind = keylist.index(i)
+				self.predecessor = keylist[ind - 1]
+				if ind != (len(keylist) - 1):
 					self.successor = keylist[ind+1]
 				else:
-					self.successor = keylist[0]         # case of last item. The successor is the first element of the list
+					self.successor = keylist[0]
 
 	def fill_finger_table(self, nodes, keylist):
 		"""Method that gets the sorted list of all alive nodes,
@@ -58,13 +63,12 @@ class Node:
 					break
 			record = (id, next_node)
 			self.finger_table.append(record)
-		# print self.finger_table
-		# print "\n"
 
 	def messages_list(self, message):
 		"""Method that gets a message for a node and writes it in its message space"""
 		self.message.append(message)
 
 	def msg_to_next(self, msg):
+		"""Send message to next node"""
 		self.msg = msg
 
